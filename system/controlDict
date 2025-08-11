@@ -1,0 +1,116 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  12
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     foamRun;
+
+solver          incompressibleFluid;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         10000;
+
+deltaT          1;
+
+writeControl    timeStep;
+
+writeInterval   500;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  8;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+libs ("libatmosphericModels.so");
+
+// ************************************************************************* //
+
+/* functions
+{
+  // ... other includes like wallShearStress, forces, etc.
+
+  #includeFunc probes_U_k;
+  #includeFunc sampleLines;
+
+  // Ensure this library is loaded for sampling functions
+  functionObjectLibs
+  (
+    "libsampling.so"
+  );
+} */
+functions
+{
+    towerProfiles
+    {
+        type            sets;
+        enabled         true;
+        verbose         true;
+        interpolationScheme cellPoint;
+        functionObjectLibs ("libsampling.so");
+
+        writeControl    writeTime;
+        writeInterval   20;
+
+        fields
+        (
+            U
+        );
+
+        sets
+        (
+            tower_SE_04
+            {
+                type            lineUniform;
+                axis            z;
+                start           (-765.92 63.09 0);
+                end             (-765.92 63.09 3000);
+                nPoints         100;
+            }
+
+            tower_SE_09
+            {
+                type            lineUniform;
+                axis            z;
+                start           (182.67 200.22 0);
+                end             (182.67 200.22 3000);
+                nPoints         100;
+            }
+
+            tower_SE_13
+            {
+                type            lineUniform;
+                axis            z;
+                start           (645.33 245.83 0);
+                end             (645.33 245.83 3000);
+                nPoints         100;
+            }
+        );
+
+        setFormat       csv;
+        setPrecision    8;
+    }
+}

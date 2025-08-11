@@ -1,0 +1,116 @@
+
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  12
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+
+backgroundMesh
+{
+    // STL Mid-points for centering the 14km x 14km domain:
+    // X_mid = (603375 + 615305) / 2 = 609340
+    // Y_mid = (4389280 + 4401210) / 2 = 4395745
+    // 14km total extent means +/- 7000m from midpoint
+    xMin -8000;  // 0 - 7000
+    xMax 8000;  // 0 + 7000
+
+    yMin -8000; // 0 - 7000
+    yMax 8000; // 0 + 7000
+
+    zMin 0;       // Start from 0m AGL (or your lowest desired Z for the domain base)
+    zMax 10000;   // 10 km AGL for the top of the domain
+
+    // Initial coarse cell counts for blockMesh.
+    // These cells will be refined by snappyHexMesh.
+    // Aim for roughly 200m per cell in XY initially (14000m / 70 cells = 200m/cell)
+    xCells 50;    // 14,000m / 70 = 200m per cell
+    yCells 50;    // 14,000m / 70 = 200m per cell
+    zCells 15;    // 10,000m / 20 = 500m per cell (or adjust as needed)
+}
+
+
+vertices
+(
+    ($!backgroundMesh/xMin $!backgroundMesh/yMin $!backgroundMesh/zMin) // 0
+    ($!backgroundMesh/xMax $!backgroundMesh/yMin $!backgroundMesh/zMin) // 1
+    ($!backgroundMesh/xMax $!backgroundMesh/yMax $!backgroundMesh/zMin) // 2
+    ($!backgroundMesh/xMin $!backgroundMesh/yMax $!backgroundMesh/zMin) // 3
+
+    ($!backgroundMesh/xMin $!backgroundMesh/yMin $!backgroundMesh/zMax) // 4
+    ($!backgroundMesh/xMax $!backgroundMesh/yMin $!backgroundMesh/zMax) // 5
+    ($!backgroundMesh/xMax $!backgroundMesh/yMax $!backgroundMesh/zMax) // 6
+    ($!backgroundMesh/xMin $!backgroundMesh/yMax $!backgroundMesh/zMax) // 7
+);
+
+
+blocks
+(
+    hex (0 1 2 3 4 5 6 7)
+    (
+        $!backgroundMesh/xCells
+        $!backgroundMesh/yCells
+        $!backgroundMesh/zCells
+    )
+    // Simple geometric grading for vertical cells: finer near ground, coarser towards top.
+    // Ratio 2.26 means top cell is ~2.26 times larger than bottom cell in the blockMesh.
+    // This is a coarse grading for the background mesh.
+    simpleGrading (1 1 5)
+);
+
+boundary
+(
+    inlet
+    {
+        type patch;
+        faces
+        (
+            (0 4 7 3)
+        );
+    }
+    outlet
+    {
+        type patch;
+        faces
+        (
+            (1 5 6 2)
+        );
+    }
+    sides
+    {
+        type patch;
+        faces
+        (
+            (0 1 5 4)
+            (3 2 6 7)
+        );
+    }
+    top
+    {
+        type patch;
+        faces
+        (
+            (4 5 6 7)
+        );
+    }
+    ground
+    {
+        type patch;
+        faces
+        (
+            (0 3 2 1)
+        );
+    }
+);
+
+mergePatchPairs
+(
+);

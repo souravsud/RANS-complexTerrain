@@ -1,0 +1,41 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+set -e
+
+runApplication blockMesh
+runApplication surfaceFeatures
+
+# First decompose base mesh for parallel snappy
+runApplication decomposePar -force
+
+# Run snappy in parallel
+runParallel snappyHexMesh -overwrite
+#runApplication snappyHexMesh -overwrite
+
+# Reconstruct the snappy mesh
+runApplication reconstructPar -constant
+
+# Remove previous processor folders to avoid conflict
+rm -rf processor*
+rm log.decomposePar
+rm log.reconstructPar
+
+runApplication checkMesh
+
+# Now decompose the snappy mesh for the solver
+runApplication decomposePar -force
+
+# Run the solver
+runParallel $(getApplication)
+
+# Reconstruct results
+runApplication reconstructParMesh -constant
+runApplication reconstructPar -latestTime
+
+rm -rf processor*
+
+python3 residualPlot.py
