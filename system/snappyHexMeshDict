@@ -26,29 +26,30 @@ geometry
         file "terrain.stl";
     }
 
-    // Innermost box - finest resolution
-    AOI_level3
-    {
-        type searchableBox;
-        min (-4000 -4000 0);
-        max (4000 4000 2000);      // 8×8m, full height
-    }
-
-    // Middle box - medium resolution  
-    AOI_level2
+    AOI_uniform
     {
         type searchableBox;
         min (-5000 -5000 0);
-        max (5000 5000 3000);      // 10×10km
+        max (5000 5000 1500);
     }
-
-    // Outer box - coarse resolution
-    AOI_level1
+    
+    // Transition zones for smooth boundary conditions
+    transition_zone
     {
         type searchableBox;
-        min (-6000 -6000 0);
-        max (6000 6000 5000);      // 12×12km
+        min (-8000 -8000 0);
+        max (8000 8000 2500);
     }
+    
+    // Outermost zone (coarse for boundary development)
+    outer_zone
+    {
+        type searchableBox;
+        min (-12000 -12000 0);
+        max (12000 12000 4000);
+    }
+
+    
 };
 
 // Castellated mesh controls
@@ -58,7 +59,7 @@ castellatedMeshControls
     maxGlobalCells 20000000;
     minRefinementCells 20;
     maxLoadUnbalance 0.1;
-    nCellsBetweenLevels 4;
+    nCellsBetweenLevels 5;
 
     features
     (
@@ -82,22 +83,32 @@ castellatedMeshControls
 
     refinementRegions
     {
-        AOI_level3
+        
+        AOI_uniform
         {
             mode inside;
-            levels ((0 3));            // 28.5m resolution
+            levels ((0 4));    // 30m resolution across ENTIRE 8x8km AOI
         }
         
-        AOI_level2
+        // Transition zones for smooth boundary conditions
+        transition_zone
         {
             mode inside;
-            levels ((0 2));            // 57m resolution
+            levels ((0 2));    // 120m resolution in transition zone
         }
         
-        AOI_level1
+        // Outermost zone (coarse for boundary development)
+        outer_zone
         {
             mode inside;
-            levels ((0 1));            // 114m resolution
+            levels ((0 1));    // 240m resolution in outer domain
+        }
+        
+        // Terrain following only in AOI
+        terrain
+        {
+            mode distance;
+            levels ((100 2) (300 1));  // Additional refinement near terrain
         }
     }
 
@@ -120,33 +131,34 @@ snapControls
 // Layer addition
 addLayersControls
 {
-    relativeSizes true;
+    relativeSizes true;  // Keep this for now
 
     layers
     {
         terrain
         {
-            nSurfaceLayers 5; // reduced to avoid common instability with terrain
+            nSurfaceLayers 8;  // Increase from 3 to 8 (Ventos had ~10-15)
         }
     }
 
-    expansionRatio 1.3;
-    firstLayerThickness 0.08; // slightly thinner first layer
-    minThickness 0.01;
+    expansionRatio 1.4;        // Increase from 1.3 (Ventos showed ~1.3-1.5)
+    firstLayerThickness 0.03;  // Reduce from 0.08 (thinner first layer)
+    minThickness 0.005;        // Reduce minimum
     nGrow 1;
 
-    featureAngle 70;
-    slipFeatureAngle 35;
-    nRelaxIter 10;
-    nSmoothSurfaceNormals 3;
-    nSmoothNormals 5;
-    nSmoothThickness 10;
-    maxFaceThicknessRatio 0.5;
-    maxThicknessToMedialRatio 0.4;
-    minMedianAxisAngle 90;
+    // More aggressive settings for terrain following
+    featureAngle 80;           // Increase from 70 (more permissive)
+    slipFeatureAngle 40;       // Increase from 35
+    nRelaxIter 15;             // Increase from 10 (more relaxation)
+    nSmoothSurfaceNormals 5;   // Increase from 3
+    nSmoothNormals 8;          // Increase from 5
+    nSmoothThickness 15;       // Increase from 10
+    maxFaceThicknessRatio 0.6; // Increase from 0.5
+    maxThicknessToMedialRatio 0.5; // Increase from 0.4
+    minMedianAxisAngle 85;     // Reduce from 90 (more flexible)
     nBufferCellsNoExtrude 0;
-    nLayerIter 60;
-    nRelaxedIter 20;
+    nLayerIter 80;             // Increase from 60 (more iterations)
+    nRelaxedIter 30;           // Increase from 20
 }
 
 // Mesh quality

@@ -16,25 +16,20 @@ FoamFile
 
 backgroundMesh
 {
-    // STL Mid-points for centering the 14km x 14km domain:
-    // X_mid = (603375 + 615305) / 2 = 609340
-    // Y_mid = (4389280 + 4401210) / 2 = 4395745
-    // 14km total extent means +/- 7000m from midpoint
-    xMin -8000;  // 0 - 7000
-    xMax 8000;  // 0 + 7000
 
-    yMin -8000; // 0 - 7000
-    yMax 8000; // 0 + 7000
+    xMin -15000;
+    xMax 15000; 
 
-    zMin 0;       // Start from 0m AGL (or your lowest desired Z for the domain base)
-    zMax 10000;   // 10 km AGL for the top of the domain
+    yMin -15000; 
+    yMax 15000; 
 
-    // Initial coarse cell counts for blockMesh.
-    // These cells will be refined by snappyHexMesh.
-    // Aim for roughly 200m per cell in XY initially (14000m / 70 cells = 200m/cell)
-    xCells 50;    // 14,000m / 70 = 200m per cell
-    yCells 50;    // 14,000m / 70 = 200m per cell
-    zCells 15;    // 10,000m / 20 = 500m per cell (or adjust as needed)
+    zMin 0;
+    zMax 10000; 
+
+
+    xCells 40;
+    yCells 40;
+    zCells 12;
 }
 
 
@@ -60,10 +55,8 @@ blocks
         $!backgroundMesh/yCells
         $!backgroundMesh/zCells
     )
-    // Simple geometric grading for vertical cells: finer near ground, coarser towards top.
-    // Ratio 2.26 means top cell is ~2.26 times larger than bottom cell in the blockMesh.
-    // This is a coarse grading for the background mesh.
-    simpleGrading (1 1 5)
+
+    simpleGrading (1 1 3)
 );
 
 boundary

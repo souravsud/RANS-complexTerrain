@@ -14,13 +14,13 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains 8; // <--- CHANGE THIS TO MATCH YOUR CORE COUNT ON THE CLUSTER
+numberOfSubdomains 8; // <---  CORE COUNT ON THE CLUSTER
 
 //decomposer      hierarchical; // Keep hierarchical
 //distributor     ptscotch;     // ptscotch is good for balancing
 method          scotch;
 
-simpleCoeffs
+/* simpleCoeffs
 {
     n               (2 2 2);
     delta           0.001;
@@ -33,5 +33,5 @@ hierarchicalCoeffs
     // (2 2 4) might also be considered if you want to partition more heavily in Z.
     n           (2 2 2); // <--- CHANGE THIS if using hierarchical
     order       xyz;
-}
+} */
 // ************************************************************************* //

@@ -19,11 +19,9 @@ def plot_residuals(log_file_path):
         'epsilon_final': [],
         'k_final': []
     }
-
     # Regular expressions to find the relevant lines
     time_pattern = re.compile(r'^Time = (\d+s)')
     residual_pattern = re.compile(r'Solving for (Ux|Uy|Uz|p|epsilon|k),.*Final residual = ([\d\.e-]+)')
-
     try:
         with open(log_file_path, 'r') as f:
             current_time = None
@@ -33,8 +31,12 @@ def plot_residuals(log_file_path):
                 if time_match:
                     # Convert the time string (e.g., '48s') to an integer
                     current_time = int(time_match.group(1)[:-1])
-                    if current_time not in data['time']:
-                        data['time'].append(current_time)
+                    # Append the new time and initialize all residual lists for this time step
+                    data['time'].append(current_time)
+                    # Append a placeholder for residuals. This will be updated below
+                    for key in data:
+                        if key != 'time':
+                            data[key].append(None) # Use None as a placeholder
 
                 # Find the final residual for each variable
                 residual_match = residual_pattern.search(line)
@@ -42,12 +44,19 @@ def plot_residuals(log_file_path):
                     variable = residual_match.group(1)
                     residual_value = float(residual_match.group(2))
                     
-                    # Store the residual value in the correct list
-                    if variable == 'p': # GAMG is used for pressure
-                        data['p_final'].append(residual_value)
-                    else: # smoothSolver is used for other variables
-                        key = f"{variable}_final"
-                        data[key].append(residual_value)
+                    key = f"{variable}_final"
+                    # Check if this is the first residual for the current time step. 
+                    # If so, append it. If not, overwrite the last entry.
+                    # This handles the multiple pressure residuals correctly.
+                    # Find the index for the current time step
+                    # The index will be the last element of the list, which is the current time step
+                    idx = len(data['time']) - 1
+
+                    if data[key][idx] is None:
+                        data[key][idx] = residual_value
+                    else:
+                        # Overwrite the previous entry. This is crucial for 'p'
+                        data[key][idx] = residual_value
 
     except FileNotFoundError:
         print(f"Error: The file '{log_file_path}' was not found.")
