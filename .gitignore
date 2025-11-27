@@ -11,6 +11,16 @@ log*
 *.vtm
 *.vtu
 
+*.vtk
+*.png
+*.json
+
+
 # Other common generated files
 constant/polyMesh/
-constant/geometry/terrain.stl
+system/blockMeshDict
+0/include/inletEpsilon
+0/include/inletFaceInfo.txt
+0/include/inletK
+0/include/inletU
+0/include/z0Values

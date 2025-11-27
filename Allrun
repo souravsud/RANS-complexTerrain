@@ -7,22 +7,6 @@ cd ${0%/*} || exit 1    # Run from this directory
 set -e
 
 runApplication blockMesh
-runApplication surfaceFeatures
-
-# First decompose base mesh for parallel snappy
-runApplication decomposePar -force
-
-# Run snappy in parallel
-runParallel snappyHexMesh -overwrite
-#runApplication snappyHexMesh -overwrite
-
-# Reconstruct the snappy mesh
-runApplication reconstructPar -constant
-
-# Remove previous processor folders to avoid conflict
-rm -rf processor*
-rm log.decomposePar
-rm log.reconstructPar
 
 runApplication checkMesh
 
@@ -31,6 +15,7 @@ runApplication decomposePar -force
 
 # Run the solver
 runParallel $(getApplication)
+#mpirun --use-hwthread-cpus -np 96 simpleFoam -parallel
 
 # Reconstruct results
 runApplication reconstructParMesh -constant

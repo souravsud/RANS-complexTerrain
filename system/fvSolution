@@ -17,17 +17,24 @@ solvers
 {
     p
     {
-        solver           GAMG;
-        tolerance        5e-4;
-        relTol           0.01;
-        smoother         GaussSeidel;
-    }
+        solver          GAMG;
+        tolerance       1e-6;
+        relTol          0.01;
+        smoother        DICGaussSeidel;
+        nPreSweeps      1;
+        nPostSweeps     2;
+        cacheAgglomeration true;
+        agglomerator    faceAreaPair;
+        nCellsInCoarsestLevel 50;
+        mergeLevels     1;
+        maxIter         60;
+}
 
     U
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
-        tolerance        5e-4;
+        tolerance        1e-6;
         relTol           0.1;
         nSweeps          1;
     }
@@ -36,18 +43,18 @@ solvers
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
-        tolerance        5e-4;
+        tolerance        1e-6;
         relTol           0.1;
-        nSweeps          1;
+        nSweeps          2;
     }
 
     epsilon
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
-        tolerance        5e-4;
+        tolerance        1e-6;
         relTol           0.1;
-        nSweeps          1;
+        nSweeps          2;
     }
 }
 
@@ -55,25 +62,29 @@ SIMPLE
 {
     nNonOrthogonalCorrectors 2;
 
-    residualControl
-    {
+    //residualControl
+    /* {
         p               1e-4;
         U               1e-4;
-        "(k|epsilon)"   1e-4;
-    }
+        "(k|epsilon)"   1e-5;
+    } */
+    pRefPoint       (608449.0 4396470.0 2750); 
+    pRefValue       0;
+    PhiRefCell      0;
+    PhiRefValue     0;
 }
 
 relaxationFactors
 {
     fields
     {
-        p               0.3;
+        p               0.40;
     }
     equations
     {
-        U               0.5;
-        k               0.5;
-        epsilon         0.5;
+        U               0.60;
+        k               0.60;
+        epsilon         0.60;
     }
 }
 

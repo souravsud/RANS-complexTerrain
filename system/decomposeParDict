@@ -14,7 +14,7 @@ FoamFile
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-numberOfSubdomains 8; // <---  CORE COUNT ON THE CLUSTER
+numberOfSubdomains 56;
 
 //decomposer      hierarchical; // Keep hierarchical
 //distributor     ptscotch;     // ptscotch is good for balancing

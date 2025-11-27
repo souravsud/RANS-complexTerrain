@@ -1,52 +1,58 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  12
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v12                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
+    version     2.0;
     format      ascii;
     class       volScalarField;
     object      k;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include        "include/initialConditions"
-
 dimensions      [0 2 -2 0 0 0 0];
 
-internalField   uniform $turbulentKE;
+internalField   uniform 0.074927;
 
 boundaryField
 {
-    outlet
-    {
-        type            inletOutlet;
-        inletValue      uniform $turbulentKE;
-        value           $internalField;
-    }
-
     inlet
     {
-        type            atmBoundaryLayerInletK;
-        #include        "include/ABLConditions"
+        type            fixedValue;
+        value           nonuniform
+        #include        "include/inletK"
+        ;
     }
-
-    terrain
+    
+    outlet
+    {
+        type            zeroGradient;
+    }
+    
+    ground
     {
         type            kqRWallFunction;
         value           uniform 0.0;
     }
-    ground
+    
+    sky
     {
-        type            fixedValue;
-        value           uniform 1e-10;;
+        type            slip;
     }
-
-    #include "include/sideAndTopPatches"
+    
+    sides
+    {
+        type            slip;
+    }
+    
+    "proc.*"
+    {
+        type            processor;
+    }
 }
-
 
 // ************************************************************************* //

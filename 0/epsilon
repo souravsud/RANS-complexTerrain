@@ -1,57 +1,61 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-  =========                 |
-  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Version:  12
-     \\/     M anipulation  |
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v12                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
+    version     2.0;
     format      ascii;
     class       volScalarField;
-    location    "0";
     object      epsilon;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 2 -3 0 0 0 0];
 
-#include        "include/initialConditions"
-
-internalField   uniform $turbulentEpsilon;
+internalField   uniform 0.00000496;
 
 boundaryField
 {
-    terrain
+    inlet
+    {
+        type            fixedValue;
+        value           nonuniform
+        #include        "include/inletEpsilon"
+        ;
+    }
+    
+    outlet
+    {
+        type            zeroGradient;
+    }
+    
+    ground
     {
         type            epsilonWallFunction;
         Cmu             0.033;
         kappa           0.4;
         E               9.8;
-        value           $internalField;
+        value           uniform 0.0016;
     }
-
-    outlet
+    
+    sky
     {
-        type            inletOutlet;
-        inletValue      uniform $turbulentEpsilon;
-        value           $internalField;
+        type            slip;
     }
-
-    inlet
+    
+    sides
     {
-        type            atmBoundaryLayerInletEpsilon;
-        #include        "include/ABLConditions"
+        type            slip;
     }
-
-    ground
+    
+    "proc.*"
     {
-        type            fixedValue;
-        value           uniform 1e-10;;
+        type            processor;
     }
-
-    #include "include/sideAndTopPatches"
 }
-
 
 // ************************************************************************* //

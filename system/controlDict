@@ -29,7 +29,7 @@ deltaT          1;
 
 writeControl    timeStep;
 
-writeInterval   1000;
+writeInterval   10000;
 
 purgeWrite      0;
 
@@ -49,21 +49,23 @@ libs ("libatmosphericModels.so");
 
 // ************************************************************************* //
 
-/* functions
-{
-  // ... other includes like wallShearStress, forces, etc.
 
-  #includeFunc probes_U_k;
-  #includeFunc sampleLines;
-
-  // Ensure this library is loaded for sampling functions
-  functionObjectLibs
-  (
-    "libsampling.so"
-  );
-} */
 functions
 {
+    fileUpdate_Solution
+    {
+        type              timeActivatedFileUpdate;
+        libs              ("libutilityFunctionObjects.so");
+        writeControl      timeStep;
+        writeInterval     1;
+        fileToUpdate      "$FOAM_CASE/system/fvSchemes";
+        timeVsFile
+        (
+            (-1   "$FOAM_CASE/system/fvSchemes_1")
+            (1000 "$FOAM_CASE/system/fvSchemes_2")
+        );
+    }
+
     towerProfiles
     {
         type            sets;
@@ -77,40 +79,40 @@ functions
 
         fields
         (
-            U
+            U k epsilon
         );
 
         sets
         (
-            tower_SE_04
+            tower_trSE_04
             {
-                type            lineUniform;
+                type            lineCell;
                 axis            z;
-                start           (-743.360 195.182 0);
-                end             (-743.360 195.182 3000);
+                start           (607684.698 4395884.594 0);
+                end             (607684.698 4395884.594 3000);
                 nPoints         100;
             }
 
-            tower_SE_09
+            tower_trSE_09
             {
-                type            lineUniform;
+                type            lineCell;
                 axis            z;
-                start           (214.780 165.432 0);
-                end             (214.780 165.432 3000);
+                start           (608437.686 4396477.584 0);
+                end             (608437.686 4396477.584 3000);
                 nPoints         100;
             }
 
-            tower_SE_13
+            tower_trSE_13
             {
-                type            lineUniform;
+                type            lineCell;
                 axis            z;
-                start           (678.212 130.126 0);
-                end             (678.212 130.126 3000);
+                start           (608815.680 4396747.579 0);
+                end             (608815.680 4396747.579 3000);
                 nPoints         100;
             }
         );
 
         setFormat       csv;
-        setPrecision    8;
+        setPrecision    6;
     }
 }
