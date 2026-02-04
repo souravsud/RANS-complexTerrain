@@ -68,12 +68,9 @@ SIMPLE
         U               1e-4;
         "(k|epsilon)"   1e-5;
     } */
-    pRefPoint       (608449.0 4396470.0 2750); 
+    pRefPoint       (608449.0 4396470.0 2750);    // replace with your coordinates
     pRefValue       0;
-    PhiRefCell      0;
-    PhiRefValue     0;
 }
-
 relaxationFactors
 {
     fields

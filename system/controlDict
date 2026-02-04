@@ -13,9 +13,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     foamRun;
-
-solver          incompressibleFluid;
+application     simpleFoam;
 
 startFrom       latestTime;
 
@@ -29,7 +27,7 @@ deltaT          1;
 
 writeControl    timeStep;
 
-writeInterval   10000;
+writeInterval   5000;
 
 purgeWrite      0;
 
@@ -55,7 +53,7 @@ functions
     fileUpdate_Solution
     {
         type              timeActivatedFileUpdate;
-        libs              ("libutilityFunctionObjects.so");
+        libs              (utilityFunctionObjects);
         writeControl      timeStep;
         writeInterval     1;
         fileToUpdate      "$FOAM_CASE/system/fvSchemes";
@@ -65,53 +63,50 @@ functions
             (1000 "$FOAM_CASE/system/fvSchemes_2")
         );
     }
-
+    
     towerProfiles
     {
         type            sets;
+        libs            (sampling);  // Changed from functionObjectLibs
         enabled         true;
         verbose         true;
         interpolationScheme cellPoint;
-        functionObjectLibs ("libsampling.so");
-
         writeControl    writeTime;
         writeInterval   1;
-
+        
         fields
         (
             U k epsilon
         );
-
+        
         sets
         (
             tower_trSE_04
             {
-                type            lineCell;
-                axis            z;
+                type            uniform;  // Changed from lineCell
+                axis            xyz;
                 start           (607684.698 4395884.594 0);
                 end             (607684.698 4395884.594 3000);
-                nPoints         100;
+                nPoints         1000;
             }
-
             tower_trSE_09
             {
-                type            lineCell;
-                axis            z;
+                type            uniform;
+                axis            xyz;
                 start           (608437.686 4396477.584 0);
                 end             (608437.686 4396477.584 3000);
-                nPoints         100;
+                nPoints         1000;
             }
-
             tower_trSE_13
             {
-                type            lineCell;
-                axis            z;
+                type            uniform;
+                axis            xyz;
                 start           (608815.680 4396747.579 0);
                 end             (608815.680 4396747.579 3000);
-                nPoints         100;
+                nPoints         1000;
             }
         );
-
+        
         setFormat       csv;
         setPrecision    6;
     }

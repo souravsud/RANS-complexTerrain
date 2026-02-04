@@ -35,10 +35,8 @@ boundaryField
     
     ground
     {
-        type            epsilonWallFunction;
-        Cmu             0.033;
-        kappa           0.4;
-        E               9.8;
+        type            atmEpsilonWallFunction;  // Now available in ESI
+        z0              #include "include/z0Values";
         value           uniform 0.0016;
     }
     

@@ -35,7 +35,7 @@ boundaryField
     
     ground
     {
-        type            nutkAtmRoughWallFunction;
+        type            atmNutkWallFunction;
         z0              #include "include/z0Values";
         value           uniform 0.0;
     }
